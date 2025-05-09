@@ -60,7 +60,17 @@ def get_APDO(date):
         return "❌ Nie udało się pobrać danych z NASA API.", None
 
 
+favorites = {}
 
+def add_to_favorites(user_id, date, title):
+    user_favs = favorites.setdefault(user_id, [])
+    if (date, title) not in user_favs:
+        user_favs.append((date, title))
+        return True
+    return False
+
+def get_user_favorites(user_id):
+    return favorites.get(user_id, [])
 
 
 @bot.command()
@@ -92,6 +102,36 @@ async def APOD(ctx, *, date: str = None):
     else:
         await ctx.send(f"❌ Brak danych dla daty: {date}")
 
+@bot.command()
+async def dodaj_ulubione(ctx, *, date: str):
+    opis, _ = get_APDO(date)
+    if not opis:
+        await ctx.send("❌ Nie znaleziono zdjęcia.")
+        return
+
+    title_line = opis.split('\n')[0].replace("**", "").strip()
+    title = title_line if title_line else "Brak tytułu"
+
+    added = add_to_favorites(str(ctx.author.id), date, title)
+    if added:
+        await ctx.send(f"✅ Dodano {date} do ulubionych!")
+    else:
+        await ctx.send("ℹ️ To zdjęcie już jest w Twoich ulubionych.")
+
+
+@bot.command()
+async def ulubione(ctx):
+    favs = get_user_favorites(str(ctx.author.id))
+
+    if not favs:
+        await ctx.send("❗ Nie masz jeszcze żadnych ulubionych.")
+        return
+
+    msg = "**📌 Twoje ulubione zdjęcia:**\n\n"
+    for fav in favs:
+        msg += f"📅 `{fav[0]}` – {fav[1]}\n"
+
+    await ctx.send(msg)
 
 # uruchamianie bota
 bot.run(bot_token) 
