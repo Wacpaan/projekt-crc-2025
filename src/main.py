@@ -75,18 +75,21 @@ def get_user_favorites(user_id):
 
 @bot.command()
 async def hi(ctx):
+    """test command"""
     await ctx.send("hi!")
 
 print(f"Token: {bot_token}")
 
 @bot.command()
 async def daily(ctx):
+    """The daily picture of APOD"""
     daily_apod, image = daily_APOD()
     
     await ctx.send(daily_apod, file=image)
 
 @bot.command()
 async def APOD(ctx, *, date: str = None):
+    """Astronomy Picture of the day, u can set the date of the picture"""
     if not date:
         today = datetime.today().strftime('%Y-%m-%d')
         await ctx.send(f"❗ Użycie: `!APOD <rrrr-mm-dd>`\nNp: `!APOD {today}`")
@@ -103,7 +106,8 @@ async def APOD(ctx, *, date: str = None):
         await ctx.send(f"❌ Brak danych dla daty: {date}")
 
 @bot.command()
-async def dodaj_ulubione(ctx, *, date: str):
+async def add_favorite(ctx, *, date: str):
+    """You can add picture do your favorites"""
     opis, _ = get_APDO(date)
     if not opis:
         await ctx.send("❌ Nie znaleziono zdjęcia.")
@@ -120,18 +124,25 @@ async def dodaj_ulubione(ctx, *, date: str):
 
 
 @bot.command()
-async def ulubione(ctx):
+async def favorite(ctx):
+    """Your favorite pictures, along with images"""
     favs = get_user_favorites(str(ctx.author.id))
-
     if not favs:
         await ctx.send("❗ Nie masz jeszcze żadnych ulubionych.")
         return
+    for date, title in favs:
+        opis, image = get_APDO(date)
 
-    msg = "**📌 Twoje ulubione zdjęcia:**\n\n"
-    for fav in favs:
-        msg += f"📅 `{fav[0]}` – {fav[1]}\n"
+        if opis and image:
+            await ctx.send("**📌 Twoje ulubione zdjęcia:**")
+            await ctx.send(f"📅 {date} \n{title}\n", file=image)
+        elif opis:
+            await ctx.send(opis + "\n🔸 (Brak obrazu – może to wideo?)")
+        else:
+            await ctx.send(f"❌ Nie udało się pobrać danych dla {date}.")
 
-    await ctx.send(msg)
+
+    
 
 # uruchamianie bota
 bot.run(bot_token) 
