@@ -9,14 +9,25 @@ from datetime import datetime, timedelta
 env_path = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(dotenv_path=env_path)
 bot_token = os.getenv("BOT_TOKEN")
-nasa_api_key = os.getenv("APOD_KEY")
+nasa_api_key = os.getenv("NASA_KEY")
 
 intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+def get_MRP(date):
+    url = f"https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?earth_date={date}&api_key={nasa_api_key}"
+    response = requests.get(url)
+    data = response.json()
 
+    photos = data.get("photos", [])
+
+    if not photos:
+        return "❌ Brak zdjec z tego dnia.", None
+    first_photo = photos[0]
+    image_url = first_photo["img_src"]
+    return f"📷 Zdjęcie z Marsa z dnia {date}:", image_url
 
 def daily_APOD():
     url = f"https://api.nasa.gov/planetary/apod?api_key={nasa_api_key}"
@@ -72,6 +83,16 @@ def add_to_favorites(user_id, date, title):
 def get_user_favorites(user_id):
     return favorites.get(user_id, [])
 
+@bot.command()
+async def MRP(ctx, *, date: str = None): 
+    """MRP"""
+    opis, url = get_MRP(date)
+    if not url:
+        await ctx.send(opis)
+    else:
+        await ctx.send(opis)
+        await ctx.send(url)
+        
 
 @bot.command()
 async def hi(ctx):
@@ -108,7 +129,7 @@ async def APOD(ctx, *, date: str = None):
 @bot.command()
 async def add_favorite(ctx, *, date: str):
     """You can add picture do your favorites"""
-    opis, _ = get_APDO(date)
+    opis, _ = get_APDO(date) or get_MRP(date)
     if not opis:
         await ctx.send("❌ Nie znaleziono zdjęcia.")
         return
