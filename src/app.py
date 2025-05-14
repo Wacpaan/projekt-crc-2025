@@ -98,7 +98,7 @@ def get_user_favorites(user_id):
 
 @bot.command()
 async def MRP(ctx, *, date: str = None): 
-    """MRP"""
+    """📸 Shows a photo from Mars for the given date (optional)."""
     opis, image = get_MRP(date)
     if not image:
         await ctx.send(opis)
@@ -108,6 +108,7 @@ async def MRP(ctx, *, date: str = None):
 
 @bot.command()
 async def random_MRP(ctx):
+        """🔀 Displays a random photo from Mars since 2012."""
         start_date = datetime.strptime('2012-08-06', '%Y-%m-%d')
         end_date = datetime.today()
 
@@ -125,21 +126,21 @@ async def random_MRP(ctx):
 
 @bot.command()
 async def hi(ctx):
-    """test command"""
+    """👋 Simple test command – bot replies with 'hi!'."""
     await ctx.send("hi!")
 
 print(f"Token: {bot_token}")
 
 @bot.command()
 async def daily(ctx):
-    """The daily picture of APOD"""
+    """🗓️ Today's Astronomy Picture of the Day (APOD)."""
     daily_apod, image = daily_APOD()
     
     await ctx.send(daily_apod, file=image)
 
 @bot.command()
 async def APOD(ctx, *, date: str = None):
-    """Astronomy Picture of the day, u can set the date of the picture"""
+    """📅 APOD image for a specific date. Format: YYYY-MM-DD."""
     if not date:
         today = datetime.today().strftime('%Y-%m-%d')
         await ctx.send(f"❗ Użycie: `!APOD <rrrr-mm-dd>`\nNp: `!APOD {today}`")
@@ -157,7 +158,7 @@ async def APOD(ctx, *, date: str = None):
 
 @bot.command()
 async def random_APOD(ctx):
-    """Random date for APOD comand"""
+    """🎲 Shows a random Astronomy Picture of the Day."""
     start_date = datetime.strptime('1995-06-16', '%Y-%m-%d' )
     end_date = datetime.today()
 
@@ -176,7 +177,7 @@ async def random_APOD(ctx):
 
 @bot.command()
 async def add_favorite(ctx, *, date: str):
-    """You can add picture do your favorites"""
+    """⭐ Add an image from a given date to your favorites."""
     opis, _ = get_APDO(date) or get_MRP(date)
     if not opis:
         await ctx.send("❌ Nie znaleziono zdjęcia.")
@@ -194,7 +195,7 @@ async def add_favorite(ctx, *, date: str):
 
 @bot.command()
 async def favorite(ctx):
-    """Your favorite pictures, along with images"""
+    """📌 Displays your list of favorite saved images."""
     favs = get_user_favorites(str(ctx.author.id))
     if not favs:
         await ctx.send("❗ Nie masz jeszcze żadnych ulubionych.")
