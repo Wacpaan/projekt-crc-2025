@@ -86,10 +86,10 @@ def random_date(start, end):
 
 favorites = {}
 
-def add_to_favorites(user_id, date, title):
+def add_to_favorites(user_id, date, title, source_type):
     user_favs = favorites.setdefault(user_id, [])
-    if (date, title) not in user_favs:
-        user_favs.append((date, title))
+    if (date, title, source_type) not in user_favs:
+        user_favs.append((date, title, source_type))
         return True
     return False
 
@@ -176,40 +176,60 @@ async def random_APOD(ctx):
 
 
 @bot.command()
-async def add_favorite(ctx, *, date: str):
-    """⭐ Add an image from a given date to your favorites."""
-    opis, _ = get_APDO(date) or get_MRP(date)
-    if not opis:
-        await ctx.send("❌ Nie znaleziono zdjęcia.")
+async def add_favorite(ctx, source: str, *, date: str):
+    """Add an APOD or Mars photo to your favorites. Usage: !add_favorite <APOD|MRP> <YYYY-MM-DD>"""
+    source = source.upper()
+
+    if source == "APOD":
+        desc, _ = get_APDO(date)
+        if desc and "No image" not in desc and "Failed" not in desc:
+            title_line = desc.split('\n')[0].replace("**", "").strip()
+            title = title_line if title_line else "No title"
+            added = add_to_favorites(str(ctx.author.id), date, title, "APOD")
+        else:
+            await ctx.send("❌ Could not find an APOD image for that date.")
+            return
+
+    elif source == "MRP":
+        desc, _ = get_MRP(date)
+        if desc and "No image" not in desc and "Failed" not in desc:
+            title = "Mars Rover Photo"
+            added = add_to_favorites(str(ctx.author.id), date, title, "MRP")
+        else:
+            await ctx.send("❌ Could not find a Mars Rover photo for that date.")
+            return
+
+    else:
+        await ctx.send("❗ Invalid source. Use `APOD` or `MRP`.\nExample: `!add_favorite APOD 2023-08-10`")
         return
 
-    title_line = opis.split('\n')[0].replace("**", "").strip()
-    title = title_line if title_line else "Brak tytułu"
-
-    added = add_to_favorites(str(ctx.author.id), date, title)
     if added:
-        await ctx.send(f"✅ Dodano {date} do ulubionych!")
+        await ctx.send(f"✅ Added {date} ({source}) to your favorites!")
     else:
-        await ctx.send("ℹ️ To zdjęcie już jest w Twoich ulubionych.")
+        await ctx.send("ℹ️ That photo is already in your favorites.")
 
 
 @bot.command()
 async def favorite(ctx):
-    """📌 Displays your list of favorite saved images."""
+    """View your favorite APOD and Mars photos."""
     favs = get_user_favorites(str(ctx.author.id))
     if not favs:
-        await ctx.send("❗ Nie masz jeszcze żadnych ulubionych.")
+        await ctx.send("❗ You don't have any favorites yet.")
         return
-    for date, title in favs:
-        opis, image = get_APDO(date)
 
-        if opis and image:
-            await ctx.send("**📌 Twoje ulubione zdjęcia:**")
-            await ctx.send(f"📅 {date} \n{title}\n", file=image)
-        elif opis:
-            await ctx.send(opis + "\n🔸 (Brak obrazu – może to wideo?)")
+    await ctx.send("**📌 Your favorite photos:**")
+    for date, title, source_type in favs:
+        if source_type == "APOD":
+            desc, image = get_APDO(date)
         else:
-            await ctx.send(f"❌ Nie udało się pobrać danych dla {date}.")
+            desc, image = get_MRP(date)
+
+        if desc and image:
+            await ctx.send(f"📅 {date} \n🧾 {title} ({source_type})", file=image)
+        elif desc:
+            await ctx.send(desc + f"\n🔸 ({source_type} – No image?)")
+        else:
+            await ctx.send(f"❌ Failed to load data for {date} ({source_type}).")
 
 
     
