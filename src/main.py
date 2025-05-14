@@ -59,6 +59,15 @@ def get_APDO(date):
     else:
         return "❌ Nie udało się pobrać danych z NASA API.", None
 
+def get_MRP(date, name):
+    url = f"https://api.nasa.gov/mars-photos/api/v1/{name}/curiosity/photos?earth_date={date}&api_key={nasa_api_key}"
+
+    response = requests.get(url)
+    data = response.json()
+
+    
+    return(data)
+
 
 favorites = {}
 
@@ -71,6 +80,11 @@ def add_to_favorites(user_id, date, title):
 
 def get_user_favorites(user_id):
     return favorites.get(user_id, [])
+
+@bot.command()
+async def MRP(ctx, *,name: str = None, date: str = None):
+    test = get_MRP(date, name)
+    await ctx.send(test)
 
 
 @bot.command()
