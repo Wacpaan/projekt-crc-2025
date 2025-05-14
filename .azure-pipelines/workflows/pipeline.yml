@@ -1,0 +1,54 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  imageName: 'space-bot-docker'  # Fixed typo in image name (was space-bot-docker)
+  acrLoginServer: 'dockerhub1.azurecr.io'
+  resourceGroup: 'myResourceGroup'
+  containerName: 'myspacebot-instance'
+  fullImageName: '$(acrLoginServer)/$(imageName)'  # Single definition for image path
+
+steps:
+  - task: Docker@2
+    displayName: Login to ACR
+    inputs:
+      command: login
+      containerRegistry: 'my-acr-service-connection'
+
+  - task: Docker@2
+    displayName: Build and push image
+    inputs:
+      command: buildAndPush
+      repository: $(fullImageName)
+      Dockerfile: ./Dockerfile
+      tags: |
+        $(Build.BuildId)
+        latest
+      containerRegistry: 'my-acr-service-connection'
+
+  - task: AzureCLI@2
+    displayName: 'Deploy to Azure Container Instance'
+    inputs:
+      azureSubscription: 'my-azure-connection'
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        # Delete if exists (ignore errors)
+        az container delete \
+          --name $(containerName) \
+          --resource-group $(resourceGroup) \
+          --yes || true
+
+        # Create new instance
+        az container create \
+          --resource-group $(resourceGroup) \
+          --name $(containerName) \
+          --image $(fullImageName):latest \
+          --registry-login-server $(acrLoginServer) \
+          --registry-username $(ACR_USERNAME) \
+          --registry-password $(ACR_PASSWORD) \
+          --dns-name-label myspacebot-demo-$(Build.BuildId) \
+          --ports 80

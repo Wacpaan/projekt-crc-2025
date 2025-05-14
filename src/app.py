@@ -70,15 +70,6 @@ def get_APDO(date):
     else:
         return "❌ Nie udało się pobrać danych z NASA API.", None
 
-def get_MRP(date, name):
-    url = f"https://api.nasa.gov/mars-photos/api/v1/{name}/curiosity/photos?earth_date={date}&api_key={nasa_api_key}"
-
-    response = requests.get(url)
-    data = response.json()
-
-    
-    return(data)
-
 
 favorites = {}
 
@@ -175,4 +166,5 @@ async def favorite(ctx):
     
 
 # uruchamianie bota
-bot.run(bot_token) 
+if __name__ == '__main__':
+    bot.run(bot_token)
