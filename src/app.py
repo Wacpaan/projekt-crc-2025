@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from discord.ext import commands
 from io import BytesIO
 from datetime import datetime, timedelta
-
+import random
 
 
 env_path = os.path.join(os.path.dirname(__file__), '.env')
@@ -64,11 +64,19 @@ def get_APDO(date):
         image_bytes = BytesIO(image_response.content)
         image = discord.File(image_bytes, filename="image.jpg")
 
-        formatted_text = f"**{title}**\n{explanation}\n{image_url}"
+        formatted_text = f"**{title}**\n{date}\n{explanation}\n{image_url}"
         return formatted_text, image
 
     else:
         return "❌ Nie udało się pobrać danych z NASA API.", None
+
+
+def random_date(start, end):
+    """Zwraca losową datę jako string YYYY-MM-DD między datami start i end."""
+    delta = end - start
+    random_days = random.randint(0, delta.days)
+    rand_date = start + timedelta(days=random_days)
+    return rand_date.strftime('%Y-%m-%d')
 
 
 favorites = {}
@@ -125,6 +133,24 @@ async def APOD(ctx, *, date: str = None):
             await ctx.send(opis + "\n🔸 (Brak obrazu – może to wideo?)")
     else:
         await ctx.send(f"❌ Brak danych dla daty: {date}")
+
+@bot.command()
+async def random_APOD(ctx):
+    start_date = datetime.strptime('1995-06-16', '%Y-%m-%d' )
+    end_date = datetime.today()
+
+    date = random_date(start_date, end_date)
+    opis, image = get_APDO(date)
+
+    if opis:
+        if image:
+            await ctx.send(opis, file=image)
+        else:
+            await ctx.send(opis + "\n🔸 (Brak obrazu – może to wideo?)")
+    else:
+        await ctx.send(f"❌ Brak danych dla daty: {date}")
+
+
 
 @bot.command()
 async def add_favorite(ctx, *, date: str):
