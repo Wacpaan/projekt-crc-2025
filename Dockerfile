@@ -13,6 +13,8 @@ COPY . .
 # Domyślna komenda startowa
 CMD ["python", "src/main.py"]
 
+# Set environment variables if needed
+ENV ENV_FILE=/app/src/.env
 
-# docker built -d space-bot
+# docker build -t space-bot
 # docker run --env-file .env space-bot
