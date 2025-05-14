@@ -216,7 +216,7 @@ async def favorite(ctx):
     await ctx.send("**📌 Your favorite photos:**")
     for date, title, source_type in favs:
         if source_type == "APOD":
-            desc, image = get_APDO(date)
+            desc, image = get_APOD(date)
         else:
             desc, image = get_MRP(date)
 
