@@ -43,7 +43,7 @@ def daily_APOD():
     image = discord.File(image_bytes, filename="image.jpg")
 
 
-    return f"**{title}**\n{explanation}\n{image_url}", image
+    return f"**📝 {title}**\n{explanation}\n{image_url}", image
 
 def get_APDO(date):
     url = f"https://api.nasa.gov/planetary/apod?api_key={nasa_api_key}&date={date}"
@@ -64,7 +64,7 @@ def get_APDO(date):
         image_bytes = BytesIO(image_response.content)
         image = discord.File(image_bytes, filename="image.jpg")
 
-        formatted_text = f"**{title}**\n{date}\n{explanation}\n{image_url}"
+        formatted_text = f"**📝 {title}**\n**📅 {date}**\n{explanation}\n{image_url}"
         return formatted_text, image
 
     else:
