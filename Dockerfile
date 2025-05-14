@@ -11,10 +11,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Domyślna komenda startowa
-CMD ["python", "src/main.py"]
+CMD ["python", "src/app.py"]
 
-# Set environment variables if needed
 ENV ENV_FILE=/app/src/.env
 
-# docker build -t space-bot
+
+# how to start
+# docker build -t space-bot .
 # docker run --env-file .env space-bot
