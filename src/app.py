@@ -27,7 +27,12 @@ def get_MRP(date):
         return "❌ Brak zdjec z tego dnia.", None
     first_photo = photos[0]
     image_url = first_photo["img_src"]
-    return f"📷 Zdjęcie z Marsa z dnia {date}:", image_url
+    image_response = requests.get(image_url)
+    image_bytes = BytesIO(image_response.content)
+
+    image = discord.File(image_bytes, filename="image.jpg")
+
+    return f"📷 Zdjęcie z Marsa z dnia {date}:", image
 
 def daily_APOD():
     url = f"https://api.nasa.gov/planetary/apod?api_key={nasa_api_key}"
@@ -72,7 +77,7 @@ def get_APDO(date):
 
 
 def random_date(start, end):
-    """Zwraca losową datę jako string YYYY-MM-DD między datami start i end."""
+    """Returns a random date as a string in the format YYYY-MM-DD between the start and end dates."""
     delta = end - start
     random_days = random.randint(0, delta.days)
     rand_date = start + timedelta(days=random_days)
@@ -94,13 +99,29 @@ def get_user_favorites(user_id):
 @bot.command()
 async def MRP(ctx, *, date: str = None): 
     """MRP"""
-    opis, url = get_MRP(date)
-    if not url:
+    opis, image = get_MRP(date)
+    if not image:
         await ctx.send(opis)
     else:
         await ctx.send(opis)
-        await ctx.send(url)
-        
+        await ctx.send(file = image)
+
+@bot.command()
+async def random_MRP(ctx):
+        start_date = datetime.strptime('2012-08-06', '%Y-%m-%d')
+        end_date = datetime.today()
+
+        date = random_date(start_date, end_date)
+        opis, image = get_MRP(date)
+
+        if opis:
+            if image:
+                await ctx.send(opis, file=image)
+            else:
+                await ctx.send(opis + "\n🔸 (Brak obrazu – może to wideo?)")
+        else:
+            await ctx.send(f"❌ Brak danych dla daty: {date}")
+
 
 @bot.command()
 async def hi(ctx):
@@ -136,6 +157,7 @@ async def APOD(ctx, *, date: str = None):
 
 @bot.command()
 async def random_APOD(ctx):
+    """Random date for APOD comand"""
     start_date = datetime.strptime('1995-06-16', '%Y-%m-%d' )
     end_date = datetime.today()
 
