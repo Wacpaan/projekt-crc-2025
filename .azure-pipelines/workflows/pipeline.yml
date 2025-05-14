@@ -30,21 +30,21 @@ steps:
 
   - task: AzureCLI@2
     inputs:
-    azureSubscription: 'my-azure-connection'
-    scriptType: bash
-    scriptLocation: inlineScript
-    inlineScript: |
-      az container delete \
-        --name myspacebot-instance \
-        --resource-group myResourceGroup \
-        --yes
+      azureSubscription: 'my-azure-connection'
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        az container delete \
+          --name myspacebot-instance \
+          --resource-group myResourceGroup \
+          --yes
 
-      az container create \
-        --resource-group myResourceGroup \
-        --name myspacebot-instance \
-        --image myregistry.azurecr.io/myspacebot:latest \
-        --registry-login-server myregistry.azurecr.io \
-        --registry-username $(ACR_USERNAME) \
-        --registry-password $(ACR_PASSWORD) \
-        --dns-name-label myspacebot-demo123 \
-        --ports 80
+        az container create \
+          --resource-group myResourceGroup \
+          --name myspacebot-instance \
+          --image myregistry.azurecr.io/myspacebot:latest \
+          --registry-login-server myregistry.azurecr.io \
+          --registry-username $(ACR_USERNAME) \
+          --registry-password $(ACR_PASSWORD) \
+          --dns-name-label myspacebot-demo123 \
+          --ports 80
