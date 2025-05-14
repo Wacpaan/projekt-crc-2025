@@ -177,7 +177,7 @@ async def add_favorite(ctx, source: str, *, date: str):
     source = source.upper()
 
     if source == "APOD":
-        desc, _ = get_APDO(date)
+        desc, _ = get_APOD(date)
         if desc and "No image" not in desc and "Failed" not in desc:
             title_line = desc.split('\n')[0].replace("**", "").strip()
             title = title_line if title_line else "No title"
