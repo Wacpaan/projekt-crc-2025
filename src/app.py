@@ -94,7 +94,7 @@ def add_to_favorites(user_id, date, title, source_type):
 def get_user_favorites(user_id):
     return favorites.get(user_id, [])
 
-# Commands
+# commands
 @bot.command()
 async def MRP(ctx, *, date: str = None): 
     """📸 Shows a Mars Rover photo for the given date."""
