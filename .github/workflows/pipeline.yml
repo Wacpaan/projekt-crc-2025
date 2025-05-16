@@ -24,6 +24,7 @@ run-name: space-bot for Crc project by @${{ github.actor }}
 jobs:
   Uninstall:
   if: ${{ github.event.inputs.operation == 'Uninstall' || github.event.inputs.operation == 'Reinstall' }}
+  runs-on: ubuntu-latest
   steps:
   - name: 'Login via Azure CLI'
     uses: azure/login@v1

@@ -114,7 +114,9 @@ async def test_command_mrp_date(mock_get):
     first_send_call = mock_ctx.send.call_args_list[0]
     assert "Mars Rover Photo" in first_send_call.args[0]
     assert "2015-03-21" in first_send_call.args[0]
-    
+
     # Sprawdzenie drugiego .send() — powinien zawierać plik
     file_send_call = next(call for call in mock_ctx.send.call_args_list if 'file' in call.kwargs)
     assert isinstance(file_send_call.kwargs['file'], discord.File)
+
+    
