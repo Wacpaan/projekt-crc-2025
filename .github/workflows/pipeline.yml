@@ -22,6 +22,29 @@ on:
 run-name: space-bot for Crc project by @${{ github.actor }}
 
 jobs:
+  Uninstall:
+  if: ${{ github.event.inputs.operation == 'Uninstall' || github.event.inputs.operation == 'Reinstall' }}
+  steps:
+  - name: 'Login via Azure CLI'
+    uses: azure/login@v1
+    with:
+      creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+  - name: Login to ACR
+    uses: azure/docker-login@v1
+    with: 
+      login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+      username: ${{ secrets.REGISTRY_USERNAME }}
+      password: ${{ secrets.REGISTRY_PASSWORD }}
+ 
+  - name: Pull image 
+    run: docker pull ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }}
+
+  - name: Remove container
+    if: ${{ github.event.inputs.operation == 'Uninstall' }}
+    run: |
+      az container delete --name space-bot --resource-group ${{ secrets.RESOURCE_GROUP }} --yes
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -67,7 +90,8 @@ jobs:
       run: |
         docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }} .
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }}
-  deploy:
+  Deploy:
+    if: ${{ github.event.inputs.operation == 'Install' || github.event.inputs.operation == 'Reinstall' }}
     needs: [test, build]
     runs-on: ubuntu-latest
     steps:
@@ -89,13 +113,7 @@ jobs:
     - name: Pull image
       run: docker pull ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }}
 
-    - name: Stop and remove container (if Uninstall or Reinstall)
-      if: ${{ github.event.inputs.operation == 'Uninstall' || github.event.inputs.operation == 'Reinstall' }}
-      run: |
-        az container delete --name space-bot --resource-group ${{ secrets.RESOURCE_GROUP }} --yes
-
     - name: Run container (if Install or Reinstall)
-      if: ${{ github.event.inputs.operation == 'Install' || github.event.inputs.operation == 'Reinstall' }}
       uses: azure/aci-deploy@v1
       with:
         resource-group: ${{ secrets.RESOURCE_GROUP }}
@@ -106,6 +124,3 @@ jobs:
         registry-password: ${{ secrets.REGISTRY_PASSWORD }}
         name: space-bot
         location: 'west europe'
-
-
-    
