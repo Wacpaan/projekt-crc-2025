@@ -29,6 +29,7 @@ jobs:
       - name: Install test Dependencies
         run: |
           pip install -r requirements.txt
+          pip install -r requirements-test.txt
           pip install pytest black
       - name: run pytest
         run: pytest
