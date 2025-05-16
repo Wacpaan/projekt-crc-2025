@@ -1,0 +1,6 @@
+# Testowanie
+pytest
+pytest-asyncio
+
+# Mockowanie
+pytest-mock
