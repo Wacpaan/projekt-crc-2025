@@ -1,17 +1,18 @@
 name: space-bot for Crc project 2025
+
 on:
   push:
     branches:
       - test
 
-run-name: space-bot for Crc project ny @${{ github.actor }}
+run-name: space-bot for Crc project by @${{ github.actor }}
 
 jobs:
   docker:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout respository
+    - name: Checkout repository
       uses: actions/checkout@v3
 
     - name: 'Login via Azure CLI'
@@ -24,27 +25,37 @@ jobs:
         echo "API_KEY=${{ secrets.API_KEY }}" >> .env
         echo "DB_URL=${{ secrets.DB_URL }}" >> .env
 
+    # ✅ Build image LOCALLY first for testing
+    - name: Build Docker image (local test)
+      run: docker build -t space-bot .
+
+    # ✅ Run container (optional step for local testing)
     - name: Run Docker container with env file
       run: docker run --env-file .env space-bot
 
-    - name: 'Build and push image'
+    # ✅ Login to your Azure Container Registry
+    - name: Azure Container Registry Login
       uses: azure/docker-login@v1
       with:
         login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
-    - run: |
-        docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }}
+
+    # ✅ Build and push image to Azure Container Registry
+    - name: Build and push image to ACR
+      run: |
+        docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }} .
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }}
 
-    - name: 'Deploy to Azure Container Instances'
-      uses: 'azure/aci-deploy@v1'
+    # ✅ Deploy container from ACR to Azure Container Instances
+    - name: Deploy to Azure Container Instances
+      uses: azure/aci-deploy@v1
       with:
-            resource-group: ${{ secrets.RESOURCE_GROUP }}
-            dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
-            image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }}
-            registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-            registry-username: ${{ secrets.REGISTRY_USERNAME }}
-            registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-            name: space-bot
-            location: 'west europe'
+        resource-group: ${{ secrets.RESOURCE_GROUP }}
+        dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
+        image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }}
+        registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        registry-username: ${{ secrets.REGISTRY_USERNAME }}
+        registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+        name: space-bot
+        location: 'westeurope'
