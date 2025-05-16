@@ -67,14 +67,14 @@ jobs:
         docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }} .
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }}
   deploy:
-  - name: 'Login via Azure CLI'
-    uses: azure/login@v1
-    with:
-      creds: ${{ secrets.AZURE_CREDENTIALS }}
-
     needs: [test, build]
     runs-on: ubuntu-latest
     steps:
+    - name: 'Login via Azure CLI'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
     - name: Login to ACR
       uses: azure/docker-login@v1
       with: 
