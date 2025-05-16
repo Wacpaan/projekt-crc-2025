@@ -16,6 +16,8 @@ on:
           - Install
           - Uninstall
           - Reinstall
+    branches:
+      - test
 
 run-name: space-bot for Crc project by @${{ github.actor }}
 
