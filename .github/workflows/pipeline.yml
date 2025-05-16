@@ -19,6 +19,12 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+    - name: Create .env file
+      run: |
+        echo "API_KEY=${{ secrets.API_KEY }}" >> .env
+        echo "DB_URL=${{ secrets.DB_URL }}" >> .env
+
+
     - name: 'Build and push image'
       uses: azure/docker-login@v1
       with:
