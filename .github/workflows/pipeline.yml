@@ -37,11 +37,11 @@ jobs:
     # ✅ Run container (optional step for local testing)
     - name: Run Docker container with env file
       run: |
-        if docker run --env-file src/.env space-bot; then
+        if docker run --env-file src/.env space-bot -d space-bot; then
           echo "Docker find src/.env"
         else
           echo "trying .env "
-          docker run --env-file .env space-bot
+          docker run --env-file .env space-bot -d space-bot
         fi
 
     # ✅ Login to your Azure Container Registry
