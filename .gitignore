@@ -3,3 +3,5 @@ env
 .idea
 .venv
 __pycache__
+old-pipeline
+.vscode
