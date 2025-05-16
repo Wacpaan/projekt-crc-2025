@@ -1,16 +1,39 @@
 name: space-bot for Crc project 2025
 
 on:
-  push:
-    branches:
-      - test
+  workflow_dispatch:
+    inputs:
+      build_image:
+        description: "Build Docker image?"
+        required: false
+        default: 'true'
+      operation:
+        description: "Choose deployment operation"
+        required: false
+        default: 'Reinstall'
+        type: choice
+        options:
+          - Install
+          - Uninstall
+          - Reinstall
 
 run-name: space-bot for Crc project by @${{ github.actor }}
 
 jobs:
-  docker:
+  test:
     runs-on: ubuntu-latest
-
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install test Dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest black
+      - name: run pytest
+        run: pytest
+  build:
+    needs: test
+    if: ${{ github.event.inputs.build_image == 'true' }}
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -27,10 +50,9 @@ jobs:
       
     - name: Create in root .env file
       run: |
-        echo "NASA_KEY=${{ secrets.API_KEY }}" >> .env
+        echo "NASA_KEY=${{ secrets.NASA_KEY }}" >> .env
         echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" >> .env
 
-    # ✅ Login to your Azure Container Registry
     - name: Azure Container Registry Login
       uses: azure/docker-login@v1
       with:
@@ -38,14 +60,32 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
 
-    # ✅ Build and push image to Azure Container Registry
     - name: Build and push image to ACR
       run: |
         docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }} .
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }}
+  deploy:
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Login to ACR
+      uses: azure/docker-login@v1
+      with: 
+        login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
 
-    # ✅ Deploy container from ACR to Azure Container Instances
-    - name: Deploy to Azure Container Instances
+    - name: Pull image
+      run: docker pull ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }}
+
+    - name: Stop and remove container (if Uninstall or Reinstall)
+      if: ${{ github.event.inputs.operation == 'Uninstall' || github.event.inputs.operation == 'Reinstall' }}
+      run: |
+        docker stop space-bot || true
+        docker rm space-bot || true
+
+    - name: Run container (if Install or Reinstall)
+      if: ${{ github.event.inputs.operation == 'Install' || github.event.inputs.operation == 'Reinstall' }}
       uses: azure/aci-deploy@v1
       with:
         resource-group: ${{ secrets.RESOURCE_GROUP }}
@@ -55,4 +95,7 @@ jobs:
         registry-username: ${{ secrets.REGISTRY_USERNAME }}
         registry-password: ${{ secrets.REGISTRY_PASSWORD }}
         name: space-bot
-        location: 'westeurope'
+        location: 'west europe'
+
+
+    
