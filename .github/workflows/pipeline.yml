@@ -30,20 +30,6 @@ jobs:
         echo "API_KEY=${{ secrets.API_KEY }}" >> .env
         echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" >> .env
 
-    # ✅ Build image LOCALLY first for testing
-    - name: Build Docker image (local test)
-      run: docker build -t space-bot .
-
-    # ✅ Run container (optional step for local testing)
-    - name: Run Docker container with env file
-      run: |
-        if docker run --env-file src/.env space-bot -d space-bot; then
-          echo "Docker find src/.env"
-        else
-          echo "trying .env "
-          docker run --env-file .env space-bot -d space-bot
-        fi
-
     # ✅ Login to your Azure Container Registry
     - name: Azure Container Registry Login
       uses: azure/docker-login@v1
