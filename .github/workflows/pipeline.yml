@@ -24,6 +24,8 @@ jobs:
         echo "API_KEY=${{ secrets.API_KEY }}" >> .env
         echo "DB_URL=${{ secrets.DB_URL }}" >> .env
 
+    - name: Run Docker container with env file
+      run: docker run --env-file .env space-bot
 
     - name: 'Build and push image'
       uses: azure/docker-login@v1
