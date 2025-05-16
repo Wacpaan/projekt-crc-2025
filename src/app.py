@@ -98,6 +98,11 @@ def get_user_favorites(user_id):
 @bot.command()
 async def MRP(ctx, *, date: str = None): 
     """📸 Shows a Mars Rover photo for the given date."""
+    if not date:
+        today = datetime.today().strftime('%Y-%m-%d')
+        await ctx.send(f"❗ Usage: `!MRP <yyyy-mm-dd>`\nExample: `!MRP {today}`")
+        return
+    
     desc, image = get_MRP(date)
     if not image:
         await ctx.send(desc)
