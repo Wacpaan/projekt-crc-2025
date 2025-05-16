@@ -24,6 +24,11 @@ jobs:
       run: |
         echo "API_KEY=${{ secrets.API_KEY }}" >> src/.env
         echo "DB_URL=${{ secrets.DB_URL }}" >> src/.env
+      
+    - name: Create in root .env file
+      run: |
+        echo "API_KEY=${{ secrets.API_KEY }}" >> src/.env
+        echo "DB_URL=${{ secrets.DB_URL }}" >> src/.env
 
     # ✅ Build image LOCALLY first for testing
     - name: Build Docker image (local test)
