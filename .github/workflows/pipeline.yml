@@ -58,8 +58,6 @@ jobs:
   build:
     if: ${{ github.event.inputs.operation != 'Uninstall' && github.event.inputs.build_image == 'true' }}
     needs: test
-    needs: test
-    if: ${{ github.event.inputs.build_image == 'true' }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
