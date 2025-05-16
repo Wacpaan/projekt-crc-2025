@@ -7,7 +7,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the app files and .env
+# Copy the app files 
 COPY . .
 # Optional: show files for debugging
 RUN ls -al /app/src
