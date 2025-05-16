@@ -38,15 +38,13 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
   
-    - name: Pull image 
-      run: docker pull ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }}
-
     - name: Remove container
       if: ${{ github.event.inputs.operation == 'Uninstall' }}
       run: |
         az container delete --name space-bot --resource-group ${{ secrets.RESOURCE_GROUP }} --yes
 
   test:
+    if: ${{ github.event.inputs.operation != 'Uninstall' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -58,6 +56,8 @@ jobs:
       - name: run pytest
         run: pytest
   build:
+    if: ${{ github.event.inputs.operation != 'Uninstall' && github.event.inputs.build_image == 'true' }}
+    needs: test
     needs: test
     if: ${{ github.event.inputs.build_image == 'true' }}
     runs-on: ubuntu-latest
