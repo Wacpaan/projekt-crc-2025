@@ -70,6 +70,9 @@ jobs:
     needs: [test, build]
     runs-on: ubuntu-latest
     steps:
+    - name: Show selected operation
+      run: echo "Selected operation ${{ github.event.inputs.operation }}"
+        
     - name: 'Login via Azure CLI'
       uses: azure/login@v1
       with:
