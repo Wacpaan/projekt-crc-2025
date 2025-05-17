@@ -58,12 +58,63 @@ pytest
 
 project-crc-2025/
 ├── src/
-│   └── bot.py         # Main bot logic
+│   └── app.py         # Main bot logic
 ├── tests/
 │   └── test_unit.py       # Unit tests
 ├── .env                   # API keys (not committed)
-├── requirements.txt       # Dependencies
+├── requirements.txt        # Dependencies
+├── requirements-test.txt       # Dependencies
 ├── README.md              # You're here!
+├── .github/
+│   └── workflows/
+│       └── pipeline.yml    # CI/CD config
+
+## ⚙️ GitHub Actions CI/CD
+
+This project uses **GitHub Actions** for CI/CD deployment and testing.
+
+The workflow file is located at:  
+`.github/workflows/pipeline.yml`
+
+### 🔁 Supported Operations
+
+You can trigger the pipeline manually from the GitHub UI via **"Run workflow"**, with the following options:
+
+- **`operation`** – Choose between:
+  - `Install`: Deploys the bot to Azure
+  - `Uninstall`: Removes the deployed container
+  - `Reinstall`: Re-deploys after uninstalling
+- **`build_image`** – Optionally skip image building (default is `true`)
+
+### 🧪 What It Does
+
+- ✅ Runs unit tests using `pytest`
+- ✅ Builds and pushes a Docker image to **Azure Container Registry**
+- ✅ Deploys to **Azure Container Instances** using `aci-deploy`
+- ✅ Supports `.env` injection via GitHub secrets
+
+### 🛠️ Secrets Used
+
+Make sure these secrets are defined in your repository:
+
+| Secret Name             | Description                               |
+|------------------------|-------------------------------------------|
+| `AZURE_CREDENTIALS`    | Azure service principal in JSON format     |
+| `REGISTRY_LOGIN_SERVER`| Azure Container Registry login server      |
+| `REGISTRY_USERNAME`    | ACR username                               |
+| `REGISTRY_PASSWORD`    | ACR password                               |
+| `RESOURCE_GROUP`        | Azure Resource Group name                 |
+| `BOT_TOKEN`            | Your Discord bot token                     |
+| `NASA_KEY`             | Your NASA API key                          |
+
+> Note: The bot image is tagged using the commit SHA (`${{ github.sha }}`), so each deployment is versioned.
+
+---
+
+This automated pipeline ensures a smooth flow from testing to deployment for each update.
+
+
+
 
 📌 Notes
 
