@@ -119,7 +119,7 @@ jobs:
     - name: Pull image
       run: docker pull ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }}
 
-    - name: Run container (if Install or Reinstall)
+    - name: Run container 
       uses: azure/aci-deploy@v1
       with:
         resource-group: ${{ secrets.RESOURCE_GROUP }}
@@ -133,7 +133,7 @@ jobs:
 
     - name: Checking of installation
       run: |
-        if az container show --resource-group ${{ github.RESOURCE_GROUP }} --name space-bot &> /dev/null; then
+        if az container show --resource-group ${{ secrets.RESOURCE_GROUP }} --name space-bot &> /dev/null; then
           echo "✅ installation complete"
         else
           echo "❌ Something go wrong, try again"
