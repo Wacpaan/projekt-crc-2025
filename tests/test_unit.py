@@ -9,7 +9,7 @@ from src.app import bot
 from src.app import daily_APOD
 from src.app import random_date
 from datetime import datetime
-
+from src.app import add_to_favorites, get_user_favorites, favorites
 # Dodanie katalogu src do ścieżki importu
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/app')))
 
@@ -18,14 +18,6 @@ def test_bot_initialization():
     assert bot.intents.message_content is True
 
 
-@pytest.mark.asyncio
-async def test_hi_command():
-    # sztuczne tworzenie ctx
-    mock_ctx = AsyncMock()
-    #wywoalnie komendy
-    await bot.get_command("hi").callback(mock_ctx)
-    # sprawdzanie czy bot odpowiedzial hi
-    mock_ctx.send.assert_called_once_with("hi!")
 
 @patch("src.app.requests.get")  
 def test_daily_apod(mock_get):
@@ -56,6 +48,45 @@ def test_random_date_range():
     end = datetime(2020, 12, 31)
     date = random_date(start, end)
     assert start.strftime('%Y-%m-%d') <= date <= end.strftime('%Y-%m-%d')
+
+
+def setup_function():
+    """Reset the global favorites dict before each test."""
+    favorites.clear()
+
+
+def test_add_to_favorites_new_entry():
+    user_id = 123
+    result = add_to_favorites(user_id, "2025-01-01", "Galaxy Pic", "APOD")
+    assert result is True
+    assert favorites[user_id] == [("2025-01-01", "Galaxy Pic", "APOD" )]
+
+def test_add_to_favorites_duplicate_entry():
+    user_id = 123
+    add_to_favorites(user_id, "2025-01-01", "Galaxy Pic", "APOD")
+    result = add_to_favorites(user_id, "2025-01-01", "Galaxy Pic", "APOD")
+    assert result is False
+    assert favorites[user_id] == [("2025-01-01", "Galaxy Pic", "APOD" )]
+
+def test_get_favorites_existing_user():
+    user_id = 456
+    add_to_favorites(user_id, "2025-03-01", "Mars photo", "MRP")
+    favs = get_user_favorites(user_id)
+    assert favs == [("2025-03-01", "Mars photo", "MRP")]
+
+def test_get_favorites_no_favorites():
+    user_id = 356
+    favs = get_user_favorites(user_id)
+    assert favs == []
+
+@pytest.mark.asyncio
+async def test_hi_command():
+    # sztuczne tworzenie ctx
+    mock_ctx = AsyncMock()
+    #wywoalnie komendy
+    await bot.get_command("hi").callback(mock_ctx)
+    # sprawdzanie czy bot odpowiedzial hi
+    mock_ctx.send.assert_called_once_with("hi!")
 
 
 @pytest.mark.asyncio
