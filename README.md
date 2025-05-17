@@ -44,8 +44,7 @@ NASA_KEY=your_nasa_api_key_here
 You can get a free NASA API key from: https://api.nasa.gov
 ▶️ Running the bot
 
-python src/app/bot.py
-
+python src/app.y
 🧪 Testing
 
 Unit tests are written with pytest and use unittest.mock to simulate external API calls.
@@ -59,8 +58,7 @@ pytest
 
 project-crc-2025/
 ├── src/
-│   └── app/
-│       └── bot.py         # Main bot logic
+│   └── bot.py         # Main bot logic
 ├── tests/
 │   └── test_unit.py       # Unit tests
 ├── .env                   # API keys (not committed)
