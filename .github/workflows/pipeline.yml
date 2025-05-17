@@ -45,10 +45,11 @@ jobs:
     - name: Test of remove container
       run: |
         echo "Checking if container 'space-bot exists... "
-        if ! az container show --resource-group ${{ secrets.RESOURCE_GROUP }} --name &> /dev/null; then
+        if ! az container show --resource-group ${{ secrets.RESOURCE_GROUP }} --name space-bot &> /dev/null; then
           echo "❌ Container does NOT exist. Uninstallation complete."
         else
           echo "Something go wrong, try again"
+        fi
   test:
     if: ${{ github.event.inputs.operation != 'Uninstall' }}
     runs-on: ubuntu-latest
