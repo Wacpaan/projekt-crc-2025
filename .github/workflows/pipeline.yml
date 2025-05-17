@@ -16,8 +16,7 @@ on:
           - Install
           - Uninstall
           - Reinstall
-    branches:
-      - test
+
 
 run-name: space-bot for Crc project by @${{ github.actor }}
 
@@ -43,6 +42,13 @@ jobs:
       run: |
         az container delete --name space-bot --resource-group ${{ secrets.RESOURCE_GROUP }} --yes
 
+    - name: Test of remove container
+      run: |
+        echo "Checking if container 'space-bot exists... "
+        if ! az container show --resource-group ${{ secrets.RESOURCE_GROUP }} --name &> /dev/null; then
+          echo "❌ Container does NOT exist. Uninstallation complete."
+        else
+          echo "Something go wrong, try again"
   test:
     if: ${{ github.event.inputs.operation != 'Uninstall' }}
     runs-on: ubuntu-latest
