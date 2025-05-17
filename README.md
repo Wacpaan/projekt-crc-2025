@@ -22,7 +22,7 @@ A Discord bot built with `discord.py` that integrates with NASA APIs to display 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/nasa-discord-bot.git
+git clone https://github.com/Wacpaan/space-bot
 cd nasa-discord-bot
 
 2. Create a virtual environment (optional)
