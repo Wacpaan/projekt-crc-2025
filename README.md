@@ -22,9 +22,9 @@ A Discord bot built with `discord.py` that integrates with NASA APIs to display 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/Wacpaan/space-bot
-cd nasa-discord-bot
-
+git clone https://github.com/Wacpaan/projekt-crc-2025
+cd projekt-crc-2025
+```
 2. Create a virtual environment (optional)
 
 python -m venv env
@@ -33,7 +33,6 @@ source env/bin/activate  # or `env\Scripts\activate` on Windows
 3. Install dependencies
 
 pip install -r requirements.txt
-
 4. Create a .env file
 
 Create a .env file in the project root and add:
@@ -45,7 +44,10 @@ You can get a free NASA API key from: https://api.nasa.gov
 ▶️ Running the bot
 
 python src/app.y
+
 🧪 Testing
+
+pip install -r requirements-test.txt
 
 Unit tests are written with pytest and use unittest.mock to simulate external API calls.
 
@@ -53,7 +55,7 @@ To run the tests:
 
 pytest
 
-✅ All 6 test cases are expected to pass.
+✅ All 10 test cases are expected to pass.
 📁 Project Structure
 
 project-crc-2025/
