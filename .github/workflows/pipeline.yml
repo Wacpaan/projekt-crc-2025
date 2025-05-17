@@ -130,3 +130,11 @@ jobs:
         registry-password: ${{ secrets.REGISTRY_PASSWORD }}
         name: space-bot
         location: 'west europe'
+
+    - name: Checking of installation
+      run: |
+        if az container show --resource-group ${{ github.RESOURCE_GROUP }} --name space-bot &> /dev/null; then
+          echo "✅ installation complete"
+        else
+          echo "❌ Something go wrong, try again"
+        fi
