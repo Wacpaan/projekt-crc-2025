@@ -56,20 +56,25 @@ To run the tests:
 pytest
 
 ✅ All 10 test cases are expected to pass.
-📁 Project Structure
 
+
+📁 **Project Structure**
+
+```
 project-crc-2025/
 ├── src/
-│   └── app.py         # Main bot logic
+│   └── app.py                # Main bot logic
 ├── tests/
-│   └── test_unit.py       # Unit tests
-├── .env                   # API keys (not committed)
-├── requirements.txt        # Dependencies
-├── requirements-test.txt       # Dependencies
-├── README.md              # You're here!
+│   └── test_unit.py          # Unit tests
+├── .env                      # API keys (not committed)
+├── requirements.txt          # Dependencies
+├── requirements-test.txt     # Test dependencies
+├── README.md                 # You're here!
 ├── .github/
 │   └── workflows/
-│       └── pipeline.yml    # CI/CD config
+│       └── pipeline.yml      # CI/CD config
+```
+
 
 ## ⚙️ GitHub Actions CI/CD
 
