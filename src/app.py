@@ -232,8 +232,25 @@ async def favorite(ctx):
         else:
             await ctx.send(f"❌ Failed to load data for {date} ({source_type}).")
 
+@bot.command()
+async def remove_favorite(ctx, source:str, *, date:str):
+    favs = get_user_favorites(str(ctx.author.id))
+    if not favs:
+        await ctx.send("❗ You don't have any favorites yet.")
+        return
 
-    
+
+    source = source.upper()
+
+    for fav in favs:
+        fav_date, fav_title, fav_source = fav
+        if fav_date == date and fav_source == source:
+            favs.remove(fav)
+            await ctx.send(f"✅ Removed favorite: {source} on {date}")
+            return
+
+    await ctx.send("❗ That favorite wasn't found.")
+
 
 if __name__ == '__main__':
     bot.run(bot_token)
