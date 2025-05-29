@@ -17,7 +17,6 @@ on:
           - Uninstall
           - Reinstall
 
-
 run-name: space-bot for Crc project by @${{ github.actor }}
 
 jobs:
@@ -50,6 +49,7 @@ jobs:
         else
           echo "Something go wrong, try again"
         fi
+        
   test:
     if: ${{ github.event.inputs.operation != 'Uninstall' }}
     runs-on: ubuntu-latest
@@ -96,6 +96,7 @@ jobs:
       run: |
         docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }} .
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/space-bot:${{ github.sha }}
+        
   Deploy:
     if: ${{ github.event.inputs.operation == 'Install' || github.event.inputs.operation == 'Reinstall' }}
     needs: [test, build]
@@ -138,3 +139,4 @@ jobs:
         else
           echo "❌ Something go wrong, try again"
         fi
+        
